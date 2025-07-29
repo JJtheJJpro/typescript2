@@ -1,0 +1,4 @@
+.antlr
+ts2g*.interp
+ts2g*.rs
+ts2g*.tokens

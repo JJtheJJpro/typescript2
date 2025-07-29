@@ -1,0 +1,7 @@
+[package]
+name = "typescript2"
+version = "0.0.1"
+edition = "2024"
+
+[dependencies]
+antlr-rust = "0.3.0-beta"
