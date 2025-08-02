@@ -1,5 +1,10 @@
 use core::f64;
-use std::{collections::HashMap, error::Error};
+use std::{
+    collections::HashMap,
+    error::Error,
+    fmt::Display,
+    ops::{Add, Div, Mul, Sub},
+};
 
 use antlr_rust::{
     InputStream,
@@ -24,6 +29,7 @@ pub mod ts2gparser;
 pub mod ts2gvisitor;
 
 #[repr(C)]
+#[derive(Clone, Copy)]
 union Number {
     u8: u8,
     i8: i8,
@@ -37,6 +43,7 @@ union Number {
     f64: f64,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum NumType {
     U8,
     I8,
@@ -49,10 +56,401 @@ enum NumType {
     F32,
     F64,
 }
+impl Display for NumType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            NumType::U8 => write!(f, "u8"),
+            NumType::I8 => write!(f, "i8"),
+            NumType::U16 => write!(f, "u16"),
+            NumType::I16 => write!(f, "i16"),
+            NumType::U32 => write!(f, "u32"),
+            NumType::I32 => write!(f, "i32"),
+            NumType::U64 => write!(f, "u64"),
+            NumType::I64 => write!(f, "i64"),
+            NumType::F32 => write!(f, "f32"),
+            NumType::F64 => write!(f, "f64"),
+        }
+    }
+}
 
+#[derive(Clone, Copy)]
 struct Value {
     v: Number,
     t: NumType,
+}
+impl Display for Value {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self.t {
+            NumType::U8 => write!(f, "{}", unsafe { self.v.u8 }),
+            NumType::I8 => write!(f, "{}", unsafe { self.v.i8 }),
+            NumType::U16 => write!(f, "{}", unsafe { self.v.u16 }),
+            NumType::I16 => write!(f, "{}", unsafe { self.v.i16 }),
+            NumType::U32 => write!(f, "{}", unsafe { self.v.u32 }),
+            NumType::I32 => write!(f, "{}", unsafe { self.v.i32 }),
+            NumType::U64 => write!(f, "{}", unsafe { self.v.u64 }),
+            NumType::I64 => write!(f, "{}", unsafe { self.v.i64 }),
+            NumType::F32 => write!(f, "{}", unsafe { self.v.f32 }),
+            NumType::F64 => write!(f, "{}", unsafe { self.v.f64 }),
+        }
+    }
+}
+impl Add for Value {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        if self.t != rhs.t {
+            panic!("Types {} and {} are not the same.", self.t, rhs.t)
+        }
+
+        match self.t {
+            NumType::U8 => Self {
+                t: self.t,
+                v: Number {
+                    u8: unsafe { self.v.u8 } + unsafe { rhs.v.u8 },
+                },
+            },
+            NumType::I8 => Self {
+                t: self.t,
+                v: Number {
+                    i8: unsafe { self.v.i8 } + unsafe { rhs.v.i8 },
+                },
+            },
+            NumType::U16 => Self {
+                t: self.t,
+                v: Number {
+                    u16: unsafe { self.v.u16 } + unsafe { rhs.v.u16 },
+                },
+            },
+            NumType::I16 => Self {
+                t: self.t,
+                v: Number {
+                    i16: unsafe { self.v.i16 } + unsafe { rhs.v.i16 },
+                },
+            },
+            NumType::U32 => Self {
+                t: self.t,
+                v: Number {
+                    u32: unsafe { self.v.u32 } + unsafe { rhs.v.u32 },
+                },
+            },
+            NumType::I32 => Self {
+                t: self.t,
+                v: Number {
+                    i32: unsafe { self.v.i32 } + unsafe { rhs.v.i32 },
+                },
+            },
+            NumType::U64 => Self {
+                t: self.t,
+                v: Number {
+                    u64: unsafe { self.v.u64 } + unsafe { rhs.v.u64 },
+                },
+            },
+            NumType::I64 => Self {
+                t: self.t,
+                v: Number {
+                    i64: unsafe { self.v.i64 } + unsafe { rhs.v.i64 },
+                },
+            },
+            NumType::F32 => Self {
+                t: self.t,
+                v: Number {
+                    f32: unsafe { self.v.f32 } + unsafe { rhs.v.f32 },
+                },
+            },
+            NumType::F64 => Self {
+                t: self.t,
+                v: Number {
+                    f64: unsafe { self.v.f64 } + unsafe { rhs.v.f64 },
+                },
+            },
+        }
+    }
+}
+impl Sub for Value {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        if self.t != rhs.t {
+            panic!("Types {} and {} are not the same.", self.t, rhs.t)
+        }
+
+        match self.t {
+            NumType::U8 => Self {
+                t: self.t,
+                v: Number {
+                    u8: unsafe { self.v.u8 } - unsafe { rhs.v.u8 },
+                },
+            },
+            NumType::I8 => Self {
+                t: self.t,
+                v: Number {
+                    i8: unsafe { self.v.i8 } - unsafe { rhs.v.i8 },
+                },
+            },
+            NumType::U16 => Self {
+                t: self.t,
+                v: Number {
+                    u16: unsafe { self.v.u16 } - unsafe { rhs.v.u16 },
+                },
+            },
+            NumType::I16 => Self {
+                t: self.t,
+                v: Number {
+                    i16: unsafe { self.v.i16 } - unsafe { rhs.v.i16 },
+                },
+            },
+            NumType::U32 => Self {
+                t: self.t,
+                v: Number {
+                    u32: unsafe { self.v.u32 } - unsafe { rhs.v.u32 },
+                },
+            },
+            NumType::I32 => Self {
+                t: self.t,
+                v: Number {
+                    i32: unsafe { self.v.i32 } - unsafe { rhs.v.i32 },
+                },
+            },
+            NumType::U64 => Self {
+                t: self.t,
+                v: Number {
+                    u64: unsafe { self.v.u64 } - unsafe { rhs.v.u64 },
+                },
+            },
+            NumType::I64 => Self {
+                t: self.t,
+                v: Number {
+                    i64: unsafe { self.v.i64 } - unsafe { rhs.v.i64 },
+                },
+            },
+            NumType::F32 => Self {
+                t: self.t,
+                v: Number {
+                    f32: unsafe { self.v.f32 } - unsafe { rhs.v.f32 },
+                },
+            },
+            NumType::F64 => Self {
+                t: self.t,
+                v: Number {
+                    f64: unsafe { self.v.f64 } - unsafe { rhs.v.f64 },
+                },
+            },
+        }
+    }
+}
+impl Mul for Value {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        if self.t != rhs.t {
+            panic!("Types {} and {} are not the same.", self.t, rhs.t)
+        }
+
+        match self.t {
+            NumType::U8 => Self {
+                t: self.t,
+                v: Number {
+                    u8: unsafe { self.v.u8 } * unsafe { rhs.v.u8 },
+                },
+            },
+            NumType::I8 => Self {
+                t: self.t,
+                v: Number {
+                    i8: unsafe { self.v.i8 } * unsafe { rhs.v.i8 },
+                },
+            },
+            NumType::U16 => Self {
+                t: self.t,
+                v: Number {
+                    u16: unsafe { self.v.u16 } * unsafe { rhs.v.u16 },
+                },
+            },
+            NumType::I16 => Self {
+                t: self.t,
+                v: Number {
+                    i16: unsafe { self.v.i16 } * unsafe { rhs.v.i16 },
+                },
+            },
+            NumType::U32 => Self {
+                t: self.t,
+                v: Number {
+                    u32: unsafe { self.v.u32 } * unsafe { rhs.v.u32 },
+                },
+            },
+            NumType::I32 => Self {
+                t: self.t,
+                v: Number {
+                    i32: unsafe { self.v.i32 } * unsafe { rhs.v.i32 },
+                },
+            },
+            NumType::U64 => Self {
+                t: self.t,
+                v: Number {
+                    u64: unsafe { self.v.u64 } * unsafe { rhs.v.u64 },
+                },
+            },
+            NumType::I64 => Self {
+                t: self.t,
+                v: Number {
+                    i64: unsafe { self.v.i64 } * unsafe { rhs.v.i64 },
+                },
+            },
+            NumType::F32 => Self {
+                t: self.t,
+                v: Number {
+                    f32: unsafe { self.v.f32 } * unsafe { rhs.v.f32 },
+                },
+            },
+            NumType::F64 => Self {
+                t: self.t,
+                v: Number {
+                    f64: unsafe { self.v.f64 } * unsafe { rhs.v.f64 },
+                },
+            },
+        }
+    }
+}
+impl Div for Value {
+    type Output = Self;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        if self.t != rhs.t {
+            panic!("Types {} and {} are not the same.", self.t, rhs.t)
+        }
+
+        match self.t {
+            NumType::U8 => Self {
+                t: self.t,
+                v: Number {
+                    u8: unsafe { self.v.u8 } / unsafe { rhs.v.u8 },
+                },
+            },
+            NumType::I8 => Self {
+                t: self.t,
+                v: Number {
+                    i8: unsafe { self.v.i8 } / unsafe { rhs.v.i8 },
+                },
+            },
+            NumType::U16 => Self {
+                t: self.t,
+                v: Number {
+                    u16: unsafe { self.v.u16 } / unsafe { rhs.v.u16 },
+                },
+            },
+            NumType::I16 => Self {
+                t: self.t,
+                v: Number {
+                    i16: unsafe { self.v.i16 } / unsafe { rhs.v.i16 },
+                },
+            },
+            NumType::U32 => Self {
+                t: self.t,
+                v: Number {
+                    u32: unsafe { self.v.u32 } / unsafe { rhs.v.u32 },
+                },
+            },
+            NumType::I32 => Self {
+                t: self.t,
+                v: Number {
+                    i32: unsafe { self.v.i32 } / unsafe { rhs.v.i32 },
+                },
+            },
+            NumType::U64 => Self {
+                t: self.t,
+                v: Number {
+                    u64: unsafe { self.v.u64 } / unsafe { rhs.v.u64 },
+                },
+            },
+            NumType::I64 => Self {
+                t: self.t,
+                v: Number {
+                    i64: unsafe { self.v.i64 } / unsafe { rhs.v.i64 },
+                },
+            },
+            NumType::F32 => Self {
+                t: self.t,
+                v: Number {
+                    f32: unsafe { self.v.f32 } / unsafe { rhs.v.f32 },
+                },
+            },
+            NumType::F64 => Self {
+                t: self.t,
+                v: Number {
+                    f64: unsafe { self.v.f64 } / unsafe { rhs.v.f64 },
+                },
+            },
+        }
+    }
+}
+impl Value {
+    pub fn powf(self, rhs: Self) -> Self {
+        if self.t != rhs.t {
+            panic!("Types {} and {} are not the same.", self.t, rhs.t)
+        }
+
+        match self.t {
+            NumType::U8 => Self {
+                t: self.t,
+                v: Number {
+                    u8: unsafe { self.v.u8 as f64 }.powf(unsafe { rhs.v.u8 } as f64) as u8,
+                },
+            },
+            NumType::I8 => Self {
+                t: self.t,
+                v: Number {
+                    i8: unsafe { self.v.i8 as f64 }.powf(unsafe { rhs.v.i8 } as f64) as i8,
+                },
+            },
+            NumType::U16 => Self {
+                t: self.t,
+                v: Number {
+                    u16: unsafe { self.v.u16 as f64 }.powf(unsafe { rhs.v.u16 } as f64) as u16,
+                },
+            },
+            NumType::I16 => Self {
+                t: self.t,
+                v: Number {
+                    i16: unsafe { self.v.i16 as f64 }.powf(unsafe { rhs.v.i16 } as f64) as i16,
+                },
+            },
+            NumType::U32 => Self {
+                t: self.t,
+                v: Number {
+                    u32: unsafe { self.v.u32 as f64 }.powf(unsafe { rhs.v.u32 } as f64) as u32,
+                },
+            },
+            NumType::I32 => Self {
+                t: self.t,
+                v: Number {
+                    i32: unsafe { self.v.i32 as f64 }.powf(unsafe { rhs.v.i32 } as f64) as i32,
+                },
+            },
+            NumType::U64 => Self {
+                t: self.t,
+                v: Number {
+                    u64: unsafe { self.v.u64 as f64 }.powf(unsafe { rhs.v.u64 } as f64) as u64,
+                },
+            },
+            NumType::I64 => Self {
+                t: self.t,
+                v: Number {
+                    i64: unsafe { self.v.i64 as f64 }.powf(unsafe { rhs.v.i64 } as f64) as i64,
+                },
+            },
+            NumType::F32 => Self {
+                t: self.t,
+                v: Number {
+                    f32: unsafe { self.v.f32 as f64 }.powf(unsafe { rhs.v.f32 } as f64) as f32,
+                },
+            },
+            NumType::F64 => Self {
+                t: self.t,
+                v: Number {
+                    f64: unsafe { self.v.f64 }.powf(unsafe { rhs.v.f64 }),
+                },
+            },
+        }
+    }
 }
 
 pub struct TS2G {
@@ -106,9 +504,10 @@ impl TS2GVisitorCompat<'_> for TS2G {
 
     fn visit_let(&mut self, ctx: &ts2gparser::LetContext<'_>) -> Self::Return {
         let id = ctx.ID().unwrap().get_text();
+        let t = ctx.TYPE().unwrap().symbol.text.to_string();
         self.visit(&*ctx.expr().unwrap());
         let res = self.stack.pop().unwrap();
-        self.vars.insert(id, Value { f64: res });
+        self.vars.insert(id, res);
     }
 
     fn visit_print(&mut self, ctx: &ts2gparser::PrintContext<'_>) -> Self::Return {
@@ -130,15 +529,30 @@ impl TS2GVisitorCompat<'_> for TS2G {
 
     fn visit_number(&mut self, ctx: &ts2gparser::NumberContext<'_>) -> Self::Return {
         let n = ctx.INT().unwrap().get_text();
-        self.stack.push(n.parse::<f64>().unwrap());
+        self.stack.push(Value {
+            v: Number {
+                f64: n.parse::<f64>().unwrap(),
+            },
+            t: NumType::F64,
+        });
     }
 
     fn visit_e(&mut self, _ctx: &ts2gparser::EContext<'_>) -> Self::Return {
-        self.stack.push(f64::consts::E);
+        self.stack.push(Value {
+            v: Number {
+                f64: f64::consts::E,
+            },
+            t: NumType::F64,
+        });
     }
 
     fn visit_pi(&mut self, _ctx: &ts2gparser::PiContext<'_>) -> Self::Return {
-        self.stack.push(f64::consts::PI);
+        self.stack.push(Value {
+            v: Number {
+                f64: f64::consts::PI,
+            },
+            t: NumType::F64,
+        });
     }
 
     fn visit_id(&mut self, ctx: &ts2gparser::IdContext<'_>) -> Self::Return {
