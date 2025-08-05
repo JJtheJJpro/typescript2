@@ -569,9 +569,9 @@ fn parse_expr<'a>(input: &'a str) -> Result<Box<Expr<'a>>, Box<dyn Error + 'a>> 
 fn main() -> Result<(), Box<dyn Error>> {
     let parser = SParser::new();
     let mut sw = Stopwatch::start_new();
-    let statements = parser.parse("let x: u64 = 1+1; print(x); x = x + 10; print(x);")?;
+    let statements = parser.parse("let x:u64=1+1;print(x);x=x+10;print(x);")?;
     sw.stop();
-    println!("Parsed in {}ms", sw.elapsed().as_micros() as f32 / 1000f32);
+    println!("Parsed code in {}ms", sw.elapsed().as_micros() as f32 / 1000f32);
 
     let mut ts2builder = TS2G::init();
 
