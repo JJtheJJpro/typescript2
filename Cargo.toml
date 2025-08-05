@@ -3,5 +3,9 @@ name = "typescript2"
 version = "0.0.1"
 edition = "2024"
 
+[build-dependencies] # <-- We added this and everything after!
+lalrpop = "0.22.2"
+
 [dependencies]
-antlr-rust = "0.3.0-beta"
+lalrpop-util = { version = "0.21.0", features = ["lexer", "unicode"] }
+stopwatch = "0.0.7"

@@ -1,1 +1,0 @@
-java -cp ./antlr4rust.jar org.antlr.v4.Tool -Dlanguage=Rust -o ./src/grammar/ ./src/grammar/TS2G.g4 -visitor
